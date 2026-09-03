@@ -1,0 +1,47 @@
+[project]
+name = "dnsmtp"
+version = "0.1.0"
+description = "A cursed proof-of-concept CLI that (mis)uses AWS Route 53 as an email service by storing messages in DNS TXT records."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3",
+    "typer",
+    "cryptography",
+    "dnspython",
+]
+
+[project.scripts]
+dnsmtp = "dnsmtp.cli:app"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "moto[route53]",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "moto[route53]",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["dnsmtp"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# B904: blind `except Exception` is a deliberate UX choice in the CLI so a
+#   partly unreadable mailbox degrades gracefully instead of crashing.
+# B008: Typer requires `typer.Option(...)` calls in argument defaults.
+# E501: ruff-format owns line width; it will not wrap long string literals.
+ignore = ["B904", "B008", "E501"]
